@@ -1,0 +1,54 @@
+# Our apps to run 
+services:
+# Auth app
+  auth:
+    # Set where we get the image from
+    build: 
+      # We build it using the docker file in the current directory
+      context: .
+      # The stage of the build to get the image from
+      target: auth-image
+    image: image-auth
+
+# Storage app
+  storage:
+    build:
+      context: .
+      target: storage-image
+
+    image: image-storage
+
+
+# Gateway
+  gateway:
+    build: 
+      context: .
+      target: gateway-image
+
+    image: image-gateway
+
+    depends_on:
+      - auth
+      - storage
+    # Set environment variable that we are gonna use in our application
+    environment:
+      - AuthApp=http://auth:80
+      - StorageApp=http://storage:80
+      
+    # The ports that we expose for the current container
+    ports:
+      - 5000:80
+
+# React frontend
+  frontend:
+    build: 
+      context: .
+      target: frontend-image
+    image: image-frontend
+    depends_on:
+      - gateway
+    ports:
+      - 80:80      
+
+
+
